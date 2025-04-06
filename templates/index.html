@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Compile Draft Helper v1.3 (Flask)</title>
+    <style>
+        /* --- CSS Styles (Copied from v1.2) --- */
+        :root {
+            --bg-color: #0a0a0f; /* Very dark blue/black */
+            --primary-color: #00ffcc; /* Neon teal/cyan */
+            --secondary-color: #7f00ff; /* Neon purple */
+            --accent-color: #ff00ff; /* Neon magenta */
+            --text-color: #e0e0e0; /* Light grey for body text */
+            --glow-color: rgba(0, 255, 204, 0.7);
+            --border-color: rgba(0, 255, 204, 0.5);
+            --disabled-color: #555;
+            --error-color: #ff4444;
+            --warning-color: #ffdd00; /* Neon Yellow */
+
+            --font-main: 'Courier New', Courier, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; overflow: hidden; font-family: var(--font-main); background-color: var(--bg-color); color: var(--text-color); font-size: 16px; }
+        body { display: flex; flex-direction: column; }
+
+        h1, h2, h3 { color: var(--primary-color); text-shadow: 0 0 5px var(--glow-color), 0 0 10px var(--glow-color); margin-bottom: 15px; text-align: center; font-weight: normal; letter-spacing: 1px; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+        h1 { font-size: 1.5rem; border-top: 1px solid var(--border-color); }
+        h1 .version { font-size: 0.8rem; color: var(--secondary-color); display: block; letter-spacing: 0; margin-top: 2px; }
+        h2 { font-size: 1.3rem; }
+        h3 { font-size: 1.1rem; color: var(--secondary-color); text-shadow: 0 0 5px var(--secondary-color), 0 0 8px var(--secondary-color); border-bottom: none; margin-top: 15px; margin-bottom: 8px; }
+
+        p { line-height: 1.6; margin-bottom: 10px; padding: 0 15px; }
+        ul { list-style: none; padding-left: 20px; margin: 10px 15px; }
+        li { margin-bottom: 8px; padding-left: 15px; position: relative; }
+        li::before { content: ">>"; position: absolute; left: -5px; top: 2px; color: var(--primary-color); font-size: 0.9rem; }
+        strong { color: var(--warning-color); font-weight: normal; }
+        a { color: var(--accent-color); text-decoration: none; text-shadow: 0 0 3px var(--accent-color); }
+        a:hover { color: var(--primary-color); }
+
+        .app-header { flex-shrink: 0; background-color: rgba(0,0,0, 0.3); }
+        .main-content { flex-grow: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; -webkit-overflow-scrolling: touch; }
+        .app-section { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .app-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .app-nav { position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; background-color: #000; border-top: 2px solid var(--primary-color); box-shadow: 0 -2px 10px var(--glow-color); flex-shrink: 0; z-index: 10; }
+        .nav-button { background-color: transparent; border: none; color: var(--primary-color); padding: 15px 10px; font-family: var(--font-main); font-size: 0.9rem; cursor: pointer; flex-grow: 1; text-align: center; opacity: 0.7; transition: background-color 0.3s, color 0.3s, opacity 0.3s; }
+        .nav-button:hover { opacity: 1; background-color: rgba(0, 255, 204, 0.1); }
+        .nav-button.active { color: var(--bg-color); background-color: var(--primary-color); font-weight: bold; opacity: 1; text-shadow: none; }
+
+        button.action-button, .protocol-button { background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 10px 15px; font-family: var(--font-main); font-size: 1.0rem; cursor: pointer; margin: 10px auto; display: block; width: 85%; max-width: 320px; text-align: center; transition: background-color 0.3s, box-shadow 0.3s; text-shadow: 0 0 3px var(--glow-color); }
+        button.action-button:hover, .protocol-button:hover { background-color: rgba(0, 255, 204, 0.15); box-shadow: 0 0 8px var(--glow-color); }
+        button.action-button:active, .protocol-button:active { background-color: rgba(0, 255, 204, 0.3); }
+        button:disabled { border-color: var(--disabled-color); color: var(--disabled-color); cursor: not-allowed; text-shadow: none; opacity: 0.5; }
+        button:disabled:hover { background-color: transparent; box-shadow: none; }
+        button.win-button { width: 45%; margin: 10px 2.5%; display: inline-block; border-color: var(--warning-color); color: var(--warning-color); }
+        button.win-button:hover { background-color: rgba(255, 221, 0, 0.15); box-shadow: 0 0 8px var(--warning-color); }
+
+        input[type="text"] { background-color: rgba(0,0,0, 0.5); border: 1px solid var(--border-color); color: var(--text-color); padding: 10px; font-family: var(--font-main); font-size: 1rem; width: calc(100% - 30px); margin: 5px 15px 15px 15px; display: block; }
+        input[type="text"]:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 8px var(--glow-color); }
+        label { display: block; margin: 10px 15px 5px 15px; color: var(--primary-color); }
+
+        /* Checkbox Style */
+        .checkbox-container { display: flex; align-items: center; justify-content: center; margin: 20px 15px; padding: 10px; border: 1px dashed var(--secondary-color); background-color: rgba(127, 0, 255, 0.05); }
+        .checkbox-container input[type="checkbox"] { appearance: none; -webkit-appearance: none; height: 20px; width: 20px; background-color: rgba(0,0,0, 0.5); border: 1px solid var(--primary-color); margin-right: 10px; cursor: pointer; position: relative; top: -1px; }
+        .checkbox-container input[type="checkbox"]:checked { background-color: var(--primary-color); box-shadow: 0 0 5px var(--glow-color); }
+        .checkbox-container input[type="checkbox"]:checked::after { content: '✓'; color: var(--bg-color); font-size: 16px; font-weight: bold; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        .checkbox-container label { margin: 0; color: var(--text-color); font-size: 0.95rem; cursor: pointer; }
+
+        /* Randomizer Styles */
+        #randomizer { text-align: center; padding: 30px 15px; border: 1px dashed var(--secondary-color); margin: 20px 0; }
+        #randomizer-status { font-size: 1.2rem; min-height: 4em; display: flex; align-items: center; justify-content: center; color: var(--accent-color); text-shadow: 0 0 5px var(--accent-color); white-space: pre-wrap; }
+        #randomizer-status::after { content: '_'; opacity: 1; animation: blink 1s linear infinite; font-weight: bold; margin-left: 5px; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Draft Specific Styles */
+        .draft-status { text-align: center; margin: 15px 0; font-size: 1.1rem; color: var(--accent-color); text-shadow: 0 0 5px var(--accent-color); min-height: 1.5em; }
+        .protocol-list-container { margin-bottom: 20px; border: 1px dashed var(--border-color); padding: 10px; background-color: rgba(0, 50, 40, 0.1); }
+        .protocol-list { list-style: none; padding: 0; margin-top: 10px; }
+        .protocol-list li { background-color: rgba(0,0,0, 0.3); border-left: 3px solid var(--secondary-color); padding: 8px 12px; margin-bottom: 5px; font-size: 1rem; }
+        .protocol-button { width: 100%; margin: 5px 0; max-width: none; font-size: 1rem; padding: 10px; }
+        .player-section { margin-bottom: 20px; }
+
+        /* Card Viewer Styles */
+        #card-filter { width: calc(100% - 30px); margin: 15px; }
+        #card-display { border: 1px solid var(--border-color); padding: 15px; margin: 15px; background-color: rgba(0,0,0,0.2); min-height: 100px; }
+        #card-display h4 { color: var(--primary-color); margin-bottom: 10px; font-size: 1.2rem; }
+        #card-display p { padding: 0; margin-bottom: 5px; }
+        #card-display strong { color: var(--text-color); font-weight: bold; }
+
+        /* Rules/FAQ Styles */
+        .rules-content h4 { color: var(--warning-color); font-size: 1rem; margin: 15px 15px 5px 15px; text-align: left; border-bottom: none; padding: 0; text-shadow: none; }
+        .rules-content p, .rules-content ul { font-size: 0.95rem; }
+        .rules-content ul { margin-top: 5px; }
+        .rules-content code { background-color: rgba(255, 255, 255, 0.1); color: var(--primary-color); padding: 1px 4px; border-radius: 3px; font-size: 0.9em; }
+
+        /* Stats Styles */
+        #stats-display { border: 1px solid var(--secondary-color); padding: 15px; margin: 20px 0; background-color: rgba(127, 0, 255, 0.05); }
+        #stats-display h3 { margin-top: 0; margin-bottom: 15px; }
+        #stats-display p { padding: 0; margin-bottom: 5px; color: var(--text-color); }
+        #stats-display strong { color: var(--primary-color); }
+        #stats-display ul { margin: 0; padding: 0; } /* Reset list style for stats */
+        #stats-display li { margin-bottom: 10px !important; padding-left: 0 !important; } /* Override default li style */
+        #stats-display li::before { content: none !important; } /* Remove default li marker */
+        #stats-display span { /* Indent matchup details */
+             display: inline-block;
+             padding-left: 15px;
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .hidden { display: none; }
+        .error-text { color: var(--error-color); text-align: center; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <h1>// COMPILE_ASSIST //<span class="version">v1.3 :: Protocol Draft (Flask Backend)</span></h1>
+    </header>
+
+    <main class="main-content">
+
+        <!-- Draft Section -->
+        <section id="section-draft" class="app-section">
+            <h2>Draft Interface Module</h2>
+
+            <!-- Initial Setup View -->
+            <div id="initial-setup">
+                 <p class="text-center">Configure draft parameters:</p>
+                 <label for="player1-name">Player 1 Handle:</label>
+                 <input type="text" id="player1-name" value="Player 1">
+                 <label for="player2-name">Player 2 Handle:</label>
+                 <input type="text" id="player2-name" value="Player 2">
+
+                 <div class="checkbox-container">
+                     <input type="checkbox" id="include-aux1" checked>
+                     <label for="include-aux1">Include Aux 1 Protocols (Light, Love, Apathy)</label>
+                 </div>
+
+                 <button id="start-draft-process-button" class="action-button">Determine Start & Begin Draft</button>
+            </div>
+
+            <!-- Randomizer View (Shown temporarily during start) -->
+            <div id="randomizer" class="hidden">
+                <h3>Determining Initial Draft Priority...</h3>
+                <div id="randomizer-status">Analyzing quantum fluctuations...</div>
+            </div>
+
+            <!-- Drafting View -->
+            <div id="drafting-interface" class="hidden">
+                <p class="text-center" style="margin-bottom:15px;"><strong id="first-player-announcement-drafting"></strong> drafts first.</p>
+                <div id="draft-status" class="draft-status">Initializing...</div>
+
+                <div class="protocol-list-container">
+                    <h3 id="available-protocols-title">Available Protocols:</h3>
+                    <div id="available-protocols-list">
+                        <!-- Protocol buttons will be generated here -->
+                    </div>
+                    <p id="draft-error" class="error-text hidden"></p>
+                </div>
+
+                <div class="player-section">
+                    <h3 id="player1-draft-title">Player 1's Acquired Protocols:</h3>
+                    <ul id="player1-protocols-list" class="protocol-list"></ul>
+                </div>
+
+                <div class="player-section">
+                     <h3 id="player2-draft-title">Player 2's Acquired Protocols:</h3>
+                    <ul id="player2-protocols-list" class="protocol-list"></ul>
+                </div>
+            </div>
+
+            <!-- Results View -->
+            <div id="draft-results" class="hidden">
+                <h2>Draft Protocol Complete</h2>
+                <p class="text-center">Final Protocol Allocation:</p>
+                <div class="player-section">
+                    <h3 id="results-p1-title">Player 1's Protocols:</h3>
+                    <ul id="results-p1-list" class="protocol-list"></ul>
+                </div>
+                 <div class="player-section">
+                    <h3 id="results-p2-title">Player 2's Protocols:</h3>
+                    <ul id="results-p2-list" class="protocol-list"></ul>
+                </div>
+                <div id="outcome-recorder">
+                     <h3>Record Game Outcome:</h3>
+                     <button id="p1-wins-button" class="action-button win-button">P1 Wins</button>
+                     <button id="p2-wins-button" class="action-button win-button">P2 Wins</button>
+                     <p id="outcome-message" class="text-center hidden"></p>
+                </div>
+                 <button id="restart-draft-button" class="action-button">Restart Draft Simulation</button>
+            </div>
+
+             <!-- Stats Display Area -->
+             <div id="stats-display" class="hidden">
+                 <h3>Session Stats (Stored via Backend)</h3>
+                 <!-- Removed the local storage warning -->
+                 <div id="stats-content">Loading stats...</div>
+                 <!-- Removed the Clear Local Stats button -->
+             </div>
+
+        </section>
+
+        <!-- Card Viewer Section -->
+        <section id="section-cards" class="app-section">
+            <h2>Card Database Access</h2>
+            <p>Filter and view card details. (Requires manual data entry in `cardData` object in the script).</p>
+            <input type="text" id="card-filter" placeholder="Search card name...">
+            <div id="card-display">
+                Search above or populate card data...
+            </div>
+        </section>
+
+        <!-- Rules/FAQ Section -->
+        <section id="section-rules" class="app-section">
+             <h2>Rules Codex & FAQ</h2>
+             <div class="rules-content">
+                 <!-- Rules content copied from v1.2 -->
+                 <h4>Summary</h4>
+                 <p>Combine 3 protocols. Wrest control by increasing line value. Use commands to shift code. Compile all 3 protocols to win.</p>
+                 <h4>The Draft</h4>
+                 <ul>
+                     <li>Arrange Protocol cards face up (12 from Main 1, optionally +3 from Aux 1).</li>
+                     <li>Randomize starting player.</li>
+                     <li>Player 1 drafts 1 Protocol.</li>
+                     <li>Player 2 drafts 2 Protocols.</li>
+                     <li>Player 1 drafts 2 Protocols.</li>
+                     <li>Player 2 drafts 1 Protocol.</li>
+                     <li>Each player now has 3 Protocols. Return remaining protocols to the box.</li>
+                 </ul>
+                 <h4>The Deck</h4>
+                 <p>Each player takes the 6 command cards for each of their 3 drafted protocols (18 cards total) and shuffles them to form their deck.</p>
+                 <h4>Setup</h4>
+                 <ul>
+                     <li>Place your 3 protocols "Loading..." side up, left to right in drafted order, forming your side of the Field.</li>
+                     <li>Place your deck and designate a Trash area.</li>
+                     <li>Draw 5 cards.</li>
+                 </ul>
+                 <h4>Turn Order</h4>
+                 <ul>
+                     <li><strong>Start:</strong> Perform "Start" effects.</li>
+                     <li><strong>Check Control A:</strong> (Optional Component) Gain control if value higher in >= 2 lines.</li>
+                     <li><strong>Check Compile:</strong> MUST Compile if value >= 10 AND > opponent in a line. Only 1 compile per turn. (Action step skipped if compiling).</li>
+                     <li><strong>Action:</strong> Play 1 card (face-up matching protocol line, or face-down any line) OR Refresh hand (draw to 5). MUST refresh if no cards to play. Cannot refresh if >= 5 cards.</li>
+                     <li><strong>Check Cache:</strong> If > 5 cards, discard down to 5.</li>
+                     <li><strong>End:</strong> Perform "End" effects.</li>
+                 </ul>
+                 <h4>Key Terms (Selected)</h4>
+                 <ul>
+                     <li><code>Compile:</code> Delete all cards in a line (yours and opponent's), flip your protocol. If already compiled, draw opponent's top deck card instead of flipping.</li>
+                     <li><code>Delete:</code> Move card from field to owner's trash (face-up).</li>
+                     <li><code>Discard:</code> Move card from hand to owner's trash.</li>
+                     <li><code>Flip:</code> Change face-down <-> face-up.</li>
+                     <li><code>Line:</code> The play area defined by two opposing protocols. (3 lines total).</li>
+                     <li><code>Protocol:</code> Defines lines, matches face-up card plays.</li>
+                     <li><code>Refresh:</code> Draw up to 5 cards (reshuffle trash if deck empty).</li>
+                     <li><code>Stack:</code> Cards in a line on one player's side.</li>
+                     <li><code>Uncovered:</code> The outermost card in a stack. Only this card can normally be targeted/manipulated.</li>
+                 </ul>
+                 <h4>FAQ Quick Hits</h4>
+                 <ul>
+                     <li>If you can compile, you MUST.</li>
+                     <li>Compiling deletes cards simultaneously (no triggers on deletion).</li>
+                     <li>You can only compile one line per turn.</li>
+                     <li>Refresh only if < 5 cards. Deck reshuffles only on draw attempt when empty.</li>
+                     <li>Look at your own face-down cards anytime. Opponent's face-down cards are private.</li>
+                     <li>"All" affects covered+uncovered simultaneously. "Each" affects viable uncovered cards sequentially.</li>
+                 </ul>
+                 <p style="margin-top: 20px;">For complete rules, clarifications, and errata, refer to the official source or the full Rules Codex PDF.</p>
+                 <p class="text-center"><a href="https://www.greaterthangames.com/" target="_blank" rel="noopener noreferrer">[ Official Greater Than Games Website ]</a></p>
+                 <p class="text-center" style="margin-top: 20px;">--- End Transmission ---</p>
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="app-nav">
+        <button class="nav-button" data-section="draft">Draft</button>
+        <button class="nav-button" data-section="cards">Cards</button>
+        <button class="nav-button" data-section="rules">Rules</button>
+    </nav>
+
+    <script>
+        // --- JavaScript for Flask Backend Interaction ---
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Global State & Elements ---
+            let gameState = 'initial-setup';
+            let currentPlayer = 1;
+            let startingPlayer = 1;
+            let currentPickNumber = 0;
+            let picksThisTurn = 0;
+            let availableProtocols = [];
+            let player1Protocols = [];
+            let player2Protocols = [];
+            let player1Name = 'Player 1';
+            let player2Name = 'Player 2';
+            let includeAux1 = true;
+            const totalProtocolsToDraft = 6;
+
+            // --- Define Protocol Pools ---
+            const mainProtocols = [
+                "Spirit", "Death", "Metal", "Gravity", "Plague", "Life",
+                "Fire", "Darkness", "Water", "Psychic", "Speed", "Hate"
+            ];
+            const auxProtocols = ["Light", "Love", "Apathy"];
+
+            // --- DOM Element References ---
+            const sections = {}; // Will be populated below
+            const navButtons = document.querySelectorAll('.nav-button');
+            const initialSetupView = document.getElementById('initial-setup');
+            const p1NameInput = document.getElementById('player1-name');
+            const p2NameInput = document.getElementById('player2-name');
+            const includeAux1Checkbox = document.getElementById('include-aux1');
+            const startDraftProcessButton = document.getElementById('start-draft-process-button');
+            const randomizerView = document.getElementById('randomizer');
+            const randomizerStatus = document.getElementById('randomizer-status');
+            const draftingInterfaceView = document.getElementById('drafting-interface');
+            const firstPlayerAnnouncementDrafting = document.getElementById('first-player-announcement-drafting');
+            const availableProtocolsTitle = document.getElementById('available-protocols-title');
+            const draftResultsView = document.getElementById('draft-results');
+            const restartDraftButton = document.getElementById('restart-draft-button');
+            const availableProtocolsList = document.getElementById('available-protocols-list');
+            const player1ProtocolsList = document.getElementById('player1-protocols-list');
+            const player2ProtocolsList = document.getElementById('player2-protocols-list');
+            const resultsP1List = document.getElementById('results-p1-list');
+            const resultsP2List = document.getElementById('results-p2-list');
+            const draftStatus = document.getElementById('draft-status');
+            const draftError = document.getElementById('draft-error');
+            const p1DraftTitle = document.getElementById('player1-draft-title');
+            const p2DraftTitle = document.getElementById('player2-draft-title');
+            const resultsP1Title = document.getElementById('results-p1-title');
+            const resultsP2Title = document.getElementById('results-p2-title');
+            const outcomeRecorder = document.getElementById('outcome-recorder');
+            const p1WinsButton = document.getElementById('p1-wins-button');
+            const p2WinsButton = document.getElementById('p2-wins-button');
+            const outcomeMessage = document.getElementById('outcome-message');
+            const statsDisplay = document.getElementById('stats-display');
+            const statsContent = document.getElementById('stats-content');
+            // Removed clearStatsButton reference
+            const cardFilterInput = document.getElementById('card-filter');
+            const cardDisplay = document.getElementById('card-display');
+
+            // Helper to get references to all sections
+            Object.assign(sections, {
+                draft: document.getElementById('section-draft'),
+                cards: document.getElementById('section-cards'),
+                rules: document.getElementById('section-rules')
+            });
+
+            // --- Navigation Logic ---
+            function showSection(sectionId) {
+                Object.values(sections).forEach(section => section.classList.remove('active'));
+                if (sections[sectionId]) {
+                    sections[sectionId].classList.add('active');
+                }
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.section === sectionId) {
+                        button.classList.add('active');
+                    }
+                });
+                const activeSection = document.querySelector('.app-section.active');
+                if (activeSection) activeSection.scrollTop = 0;
+                 // Load stats when navigating to draft section after game completion or restart
+                if (sectionId === 'draft' && (gameState === 'post-game' || gameState === 'results')) {
+                   loadAndDisplayStats(); // Will make statsDisplay visible
+                } else if (sectionId !== 'draft') {
+                    statsDisplay.classList.add('hidden'); // Hide stats if navigating away
+                }
+            }
+            navButtons.forEach(button => button.addEventListener('click', () => showSection(button.dataset.section)));
+
+            // --- Main Draft Start Process ---
+            function startDraftProcess() {
+                player1Name = p1NameInput.value.trim() || 'Player 1';
+                player2Name = p2NameInput.value.trim() || 'Player 2';
+                includeAux1 = includeAux1Checkbox.checked;
+
+                p1DraftTitle.textContent = `${player1Name}'s Acquired Protocols:`;
+                p2DraftTitle.textContent = `${player2Name}'s Acquired Protocols:`;
+                resultsP1Title.textContent = `${player1Name}'s Final Protocols:`;
+                resultsP2Title.textContent = `${player2Name}'s Final Protocols:`;
+                p1WinsButton.textContent = `${player1Name} Wins`;
+                p2WinsButton.textContent = `${player2Name} Wins`;
+
+                initialSetupView.classList.add('hidden');
+                randomizerView.classList.remove('hidden');
+                gameState = 'randomizing';
+                startDraftProcessButton.disabled = true;
+                runRandomizer();
+            }
+
+            // --- Randomizer Logic ---
+            function runRandomizer() {
+                randomizerStatus.textContent = "Calibrating AI core...";
+                let counter = 0;
+                const messages = [ "Scanning tachyon signatures...", "Accessing probability matrix...", "Querying subspace anomalies...", "Rerouting power flow...", "Engaging stochastic decision engine...", "Finalizing priority sequence..." ];
+                const interval = setInterval(() => {
+                    randomizerStatus.textContent = messages[counter % messages.length];
+                    counter++;
+                    if (counter > messages.length + Math.random() * 3) {
+                        clearInterval(interval);
+                        startingPlayer = Math.random() < 0.5 ? 1 : 2;
+                        const startingPlayerNameText = startingPlayer === 1 ? player1Name : player2Name;
+                        randomizerStatus.textContent = `\n>>> ${startingPlayerNameText} <<< \nhas established initial connection.\nThey will draft first.`;
+                        randomizerStatus.style.color = 'var(--primary-color)';
+                        randomizerStatus.style.fontSize = '1.3rem';
+                        randomizerStatus.style.fontWeight = 'bold';
+                        randomizerStatus.style.lineHeight = '1.4';
+                        setTimeout(setupAndStartDraft, 1500); // Proceed after showing result
+                    }
+                }, 400);
+            }
+
+            // --- Setup Draft State & UI (Called after randomizer) ---
+             function setupAndStartDraft() {
+                 randomizerView.classList.add('hidden');
+                 draftingInterfaceView.classList.remove('hidden');
+                 firstPlayerAnnouncementDrafting.textContent = `${startingPlayer === 1 ? player1Name : player2Name}`;
+
+                 const currentProtocolPool = includeAux1 ? [...mainProtocols, ...auxProtocols] : [...mainProtocols];
+                 availableProtocolsTitle.textContent = `Available Protocols (${currentProtocolPool.length} Total):`;
+                 availableProtocols = [...currentProtocolPool].sort(() => Math.random() - 0.5);
+                 player1Protocols = [];
+                 player2Protocols = [];
+                 currentPickNumber = 0;
+                 currentPlayer = startingPlayer;
+                 gameState = 'drafting';
+                 outcomeRecorder.classList.add('hidden');
+                 outcomeMessage.classList.add('hidden');
+                 statsDisplay.classList.add('hidden');
+
+                 determineNextPick();
+                 updateDraftUI();
+            }
+
+            // --- Draft Logic ---
+             function determineNextPick() {
+                 currentPickNumber++;
+                 draftError.classList.add('hidden');
+                 if (currentPickNumber === 1) { currentPlayer = startingPlayer; picksThisTurn = 1; }
+                 else if (currentPickNumber === 2 || currentPickNumber === 3) { currentPlayer = (startingPlayer === 1) ? 2 : 1; picksThisTurn = 1; }
+                 else if (currentPickNumber === 4 || currentPickNumber === 5) { currentPlayer = startingPlayer; picksThisTurn = 1; }
+                 else if (currentPickNumber === 6) { currentPlayer = (startingPlayer === 1) ? 2 : 1; picksThisTurn = 1; }
+                 else { endDraft(); return; }
+
+                 let pickInstruction = "";
+                 if (currentPickNumber === 2) pickInstruction = "(Pick 1 of 2)";
+                 if (currentPickNumber === 3) pickInstruction = "(Pick 2 of 2)";
+                 if (currentPickNumber === 4) pickInstruction = "(Pick 1 of 2)";
+                 if (currentPickNumber === 5) pickInstruction = "(Pick 2 of 2)";
+                 const currentTurnPlayerName = currentPlayer === 1 ? player1Name : player2Name;
+                 draftStatus.textContent = `Pick ${currentPickNumber}/${totalProtocolsToDraft}: ${currentTurnPlayerName} selects 1 Protocol ${pickInstruction}`;
+             }
+
+             function selectProtocol(protocolName) {
+                if (gameState !== 'drafting' || picksThisTurn <= 0) return;
+                const packIndex = availableProtocols.indexOf(protocolName);
+                if (packIndex > -1) {
+                    availableProtocols.splice(packIndex, 1);
+                    if (currentPlayer === 1) player1Protocols.push(protocolName); else player2Protocols.push(protocolName);
+                    picksThisTurn--;
+                    if (currentPickNumber >= totalProtocolsToDraft) endDraft(); else { determineNextPick(); updateDraftUI(); }
+                } else {
+                    draftError.textContent = "Error: Protocol already selected or invalid."; draftError.classList.remove('hidden');
+                }
+             }
+
+             function endDraft() {
+                 gameState = 'results';
+                 draftingInterfaceView.classList.add('hidden');
+                 draftResultsView.classList.remove('hidden');
+                 outcomeRecorder.classList.remove('hidden');
+                 p1WinsButton.disabled = false;
+                 p2WinsButton.disabled = false;
+                 outcomeMessage.classList.add('hidden');
+                 updateDraftUI();
+                 loadAndDisplayStats(); // Load stats when draft ends
+            }
+
+            // --- UI Update Logic ---
+            function updateDraftUI() {
+                availableProtocolsList.innerHTML = '';
+                if (gameState === 'drafting') {
+                    availableProtocols.forEach(protocol => {
+                        const button = document.createElement('button');
+                        button.textContent = `SELECT: ${protocol}`;
+                        button.classList.add('protocol-button');
+                        button.onclick = () => selectProtocol(protocol);
+                        availableProtocolsList.appendChild(button);
+                    });
+                }
+                player1ProtocolsList.innerHTML = ''; player1Protocols.forEach(p => { const li = document.createElement('li'); li.textContent = p; player1ProtocolsList.appendChild(li); });
+                player2ProtocolsList.innerHTML = ''; player2Protocols.forEach(p => { const li = document.createElement('li'); li.textContent = p; player2ProtocolsList.appendChild(li); });
+                resultsP1List.innerHTML = ''; player1Protocols.forEach(p => { const li = document.createElement('li'); li.textContent = p; resultsP1List.appendChild(li); });
+                resultsP2List.innerHTML = ''; player2Protocols.forEach(p => { const li = document.createElement('li'); li.textContent = p; resultsP2List.appendChild(li); });
+            }
+
+             // --- Restart Logic ---
+             function restartDraft() {
+                 gameState = 'initial-setup';
+                 draftResultsView.classList.add('hidden');
+                 draftingInterfaceView.classList.add('hidden');
+                 randomizerView.classList.add('hidden');
+                 statsDisplay.classList.add('hidden'); // Hide stats on restart
+                 initialSetupView.classList.remove('hidden');
+                 startDraftProcessButton.disabled = false;
+                 randomizerStatus.textContent = 'Analyzing quantum fluctuations...';
+                 randomizerStatus.style.color = 'var(--accent-color)';
+                 randomizerStatus.style.fontSize = '1.2rem';
+                 randomizerStatus.style.fontWeight = 'normal';
+                 availableProtocolsList.innerHTML = ''; player1ProtocolsList.innerHTML = ''; player2ProtocolsList.innerHTML = ''; resultsP1List.innerHTML = ''; resultsP2List.innerHTML = '';
+                 draftStatus.textContent = 'Initializing...';
+             }
+
+            // --- Game Outcome & Stats Logic (Using Fetch to Flask Backend) ---
+            async function recordWin(winningPlayer) {
+                if (gameState !== 'results' && gameState !== 'post-game') return;
+
+                p1WinsButton.disabled = true;
+                p2WinsButton.disabled = true;
+                outcomeMessage.textContent = "Logging game outcome...";
+                outcomeMessage.style.color = 'var(--warning-color)';
+                outcomeMessage.classList.remove('hidden');
+
+                const winnerName = winningPlayer === 1 ? player1Name : player2Name;
+
+                const gameData = {
+                    player1Name: player1Name,
+                    player1Protocols: player1Protocols,
+                    player2Name: player2Name,
+                    player2Protocols: player2Protocols,
+                    winnerName: winnerName
+                };
+
+                try {
+                    const response = await fetch('/api/log_game', { // Relative path
+                        method: 'POST',
+                        cache: 'no-cache',
+                        headers: { 'Content-Type': 'application/json', },
+                        body: JSON.stringify(gameData)
+                    });
+                    const result = await response.json();
+
+                    if (response.ok && result.status === 'success') {
+                        outcomeMessage.textContent = `Outcome recorded: ${winnerName} wins!`;
+                        outcomeMessage.style.color = 'var(--primary-color)';
+                        gameState = 'post-game';
+                        loadAndDisplayStats(); // Refresh stats
+                    } else {
+                        throw new Error(result.message || `HTTP error ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error('Error recording win:', error);
+                    outcomeMessage.textContent = `Error recording outcome: ${error.message}`;
+                    outcomeMessage.style.color = 'var(--error-color)';
+                }
+                outcomeMessage.classList.remove('hidden');
+            }
+
+            async function loadAndDisplayStats() {
+                statsContent.innerHTML = '<p>Loading stats from server...</p>';
+                statsDisplay.classList.remove('hidden');
+
+                try {
+                    const response = await fetch('/api/stats', { // Relative path
+                        method: 'GET',
+                        cache: 'no-cache'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const result = await response.json();
+
+                    if (result.status === 'success' && result.data) {
+                        const stats = result.data;
+                        statsContent.innerHTML = ''; // Clear loading
+
+                        if (!stats || stats.gamesPlayed === 0) {
+                            statsContent.innerHTML = '<p>No game data recorded yet.</p>';
+                            statsDisplay.classList.remove('hidden'); // Keep container visible
+                            return;
+                        }
+
+                        let html = `<p><strong>Total Games Recorded:</strong> ${stats.gamesPlayed}</p>`;
+
+                        // --- Player Wins ---
+                        html += '<h3>Player Win Counts:</h3>';
+                        const sortedPlayers = Object.entries(stats.playerWins || {}).sort(([, a], [, b]) => b - a);
+                        if (sortedPlayers.length === 0) { html += '<p>No player wins recorded.</p>'; }
+                        else { sortedPlayers.forEach(([name, wins]) => { html += `<p><strong>${name}:</strong> ${wins} wins</p>`; }); }
+
+                        // --- Overall Protocol Stats ---
+                        html += '<h3 style="margin-top: 15px;">Overall Protocol Stats (W/L):</h3>';
+                        const sortedProtocols = Object.entries(stats.protocolStats || {}).sort(([keyA], [keyB]) => keyA.localeCompare(keyB));
+                        if (sortedProtocols.length === 0) { html += '<p>No protocol stats recorded.</p>'; }
+                        else {
+                            sortedProtocols.forEach(([name, data]) => {
+                                const wins = data.wins || 0; const losses = data.losses || 0; const total = wins + losses; const winRate = total > 0 ? ((wins / total) * 100).toFixed(0) : 0;
+                                html += `<p><strong>${name}:</strong> ${wins}W / ${losses}L (${winRate}%)</p>`;
+                            });
+                        }
+
+                        // --- Detailed Matchup Stats ---
+                        html += '<h3 style="margin-top: 15px;">Protocol Matchups (Based on Draft Slot):</h3>';
+                        const sortedMatchups = Object.entries(stats.protocolMatchups || {}).sort(([keyA], [keyB]) => keyA.localeCompare(keyB));
+                        if (sortedMatchups.length === 0) { html += '<p>No matchup stats recorded.</p>'; }
+                        else {
+                            html += '<ul>';
+                            sortedMatchups.forEach(([key, data]) => {
+                                const [protoA, protoB] = key.split('_vs_');
+                                const winsA = data.wins_A || 0; const lossesA = data.losses_A || 0; const totalGames = winsA + lossesA;
+                                const winsB = lossesA; const lossesB = winsA;
+                                const winRateA = totalGames > 0 ? ((winsA / totalGames) * 100).toFixed(0) : 0;
+                                const winRateB = totalGames > 0 ? ((winsB / totalGames) * 100).toFixed(0) : 0;
+                                html += `<li>`;
+                                html += `<strong>${protoA}</strong> vs <strong>${protoB}</strong> (Total: ${totalGames})<br>`;
+                                html += `<span>${protoA}: ${winsA}W / ${lossesA}L (${winRateA}%)</span><br>`;
+                                html += `<span>${protoB}: ${winsB}W / ${lossesB}L (${winRateB}%)</span>`;
+                                html += `</li>`;
+                            });
+                            html += '</ul>';
+                        }
+                        statsContent.innerHTML = html;
+
+                    } else {
+                        throw new Error(result.message || 'Failed to parse stats data.');
+                    }
+                } catch (error) {
+                    console.error('Error loading stats:', error);
+                    statsContent.innerHTML = `<p class="error-text">Error loading stats: ${error.message}.</p>`;
+                }
+                statsDisplay.classList.remove('hidden'); // Ensure container is visible even on error
+            }
+
+
+            // --- Card Viewer Logic (Placeholder) ---
+            const cardData = { /* Needs populating */ };
+            function displayCard(cardName) { cardDisplay.textContent = `Display logic for "${cardName}" not implemented. Populate 'cardData'.`; }
+            function filterCards() { cardDisplay.textContent = `Search logic not implemented. Populate 'cardData'.`; }
+            cardFilterInput.addEventListener('input', filterCards);
+
+            // --- Event Listeners ---
+            startDraftProcessButton.addEventListener('click', startDraftProcess);
+            restartDraftButton.addEventListener('click', restartDraft);
+            p1WinsButton.addEventListener('click', () => recordWin(1));
+            p2WinsButton.addEventListener('click', () => recordWin(2));
+             // Removed listener for clearStatsButton
+
+            // --- Initial Setup ---
+            showSection('draft');
+            initialSetupView.classList.remove('hidden');
+            randomizerView.classList.add('hidden');
+            draftingInterfaceView.classList.add('hidden');
+            draftResultsView.classList.add('hidden');
+            statsDisplay.classList.add('hidden');
+
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>
