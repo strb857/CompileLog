@@ -1,0 +1,109 @@
+/* --- CSS Styles (Moved from HTML <style> tag) --- */
+:root {
+    --bg-color: #0a0a0f; /* Very dark blue/black */
+    --primary-color: #00ffcc; /* Neon teal/cyan */
+    --secondary-color: #7f00ff; /* Neon purple */
+    --accent-color: #ff00ff; /* Neon magenta */
+    --text-color: #e0e0e0; /* Light grey for body text */
+    --glow-color: rgba(0, 255, 204, 0.7);
+    --border-color: rgba(0, 255, 204, 0.5);
+    --disabled-color: #555;
+    --error-color: #ff4444;
+    --warning-color: #ffdd00; /* Neon Yellow */
+
+    --font-main: 'Courier New', Courier, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; font-family: var(--font-main); background-color: var(--bg-color); color: var(--text-color); font-size: 16px; }
+body { display: flex; flex-direction: column; }
+
+h1, h2, h3 { color: var(--primary-color); text-shadow: 0 0 5px var(--glow-color), 0 0 10px var(--glow-color); margin-bottom: 15px; text-align: center; font-weight: normal; letter-spacing: 1px; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+h1 { font-size: 1.5rem; border-top: 1px solid var(--border-color); }
+h1 .version { font-size: 0.8rem; color: var(--secondary-color); display: block; letter-spacing: 0; margin-top: 2px; }
+h2 { font-size: 1.3rem; }
+h3 { font-size: 1.1rem; color: var(--secondary-color); text-shadow: 0 0 5px var(--secondary-color), 0 0 8px var(--secondary-color); border-bottom: none; margin-top: 15px; margin-bottom: 8px; }
+
+p { line-height: 1.6; margin-bottom: 10px; padding: 0 15px; }
+ul { list-style: none; padding-left: 20px; margin: 10px 15px; }
+li { margin-bottom: 8px; padding-left: 15px; position: relative; }
+li::before { content: ">>"; position: absolute; left: -5px; top: 2px; color: var(--primary-color); font-size: 0.9rem; }
+strong { color: var(--warning-color); font-weight: normal; }
+a { color: var(--accent-color); text-decoration: none; text-shadow: 0 0 3px var(--accent-color); }
+a:hover { color: var(--primary-color); }
+
+.app-header { flex-shrink: 0; background-color: rgba(0,0,0, 0.3); }
+.main-content { flex-grow: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; -webkit-overflow-scrolling: touch; }
+.app-section { display: none; animation: fadeIn 0.5s ease-in-out; }
+.app-section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.app-nav { position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; background-color: #000; border-top: 2px solid var(--primary-color); box-shadow: 0 -2px 10px var(--glow-color); flex-shrink: 0; z-index: 10; }
+.nav-button { background-color: transparent; border: none; color: var(--primary-color); padding: 15px 10px; font-family: var(--font-main); font-size: 0.9rem; cursor: pointer; flex-grow: 1; text-align: center; opacity: 0.7; transition: background-color 0.3s, color 0.3s, opacity 0.3s; }
+.nav-button:hover { opacity: 1; background-color: rgba(0, 255, 204, 0.1); }
+.nav-button.active { color: var(--bg-color); background-color: var(--primary-color); font-weight: bold; opacity: 1; text-shadow: none; }
+
+button.action-button, .protocol-button { background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 10px 15px; font-family: var(--font-main); font-size: 1.0rem; cursor: pointer; margin: 10px auto; display: block; width: 85%; max-width: 320px; text-align: center; transition: background-color 0.3s, box-shadow 0.3s; text-shadow: 0 0 3px var(--glow-color); }
+button.action-button:hover, .protocol-button:hover { background-color: rgba(0, 255, 204, 0.15); box-shadow: 0 0 8px var(--glow-color); }
+button.action-button:active, .protocol-button:active { background-color: rgba(0, 255, 204, 0.3); }
+button:disabled { border-color: var(--disabled-color); color: var(--disabled-color); cursor: not-allowed; text-shadow: none; opacity: 0.5; }
+button:disabled:hover { background-color: transparent; box-shadow: none; }
+button.win-button { width: 45%; margin: 10px 2.5%; display: inline-block; border-color: var(--warning-color); color: var(--warning-color); }
+button.win-button:hover { background-color: rgba(255, 221, 0, 0.15); box-shadow: 0 0 8px var(--warning-color); }
+
+input[type="text"] { background-color: rgba(0,0,0, 0.5); border: 1px solid var(--border-color); color: var(--text-color); padding: 10px; font-family: var(--font-main); font-size: 1rem; width: calc(100% - 30px); margin: 5px 15px 15px 15px; display: block; }
+input[type="text"]:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 8px var(--glow-color); }
+label { display: block; margin: 10px 15px 5px 15px; color: var(--primary-color); }
+
+/* Checkbox Style */
+.checkbox-container { display: flex; align-items: center; justify-content: center; margin: 20px 15px; padding: 10px; border: 1px dashed var(--secondary-color); background-color: rgba(127, 0, 255, 0.05); }
+.checkbox-container input[type="checkbox"] { appearance: none; -webkit-appearance: none; height: 20px; width: 20px; background-color: rgba(0,0,0, 0.5); border: 1px solid var(--primary-color); margin-right: 10px; cursor: pointer; position: relative; top: -1px; }
+.checkbox-container input[type="checkbox"]:checked { background-color: var(--primary-color); box-shadow: 0 0 5px var(--glow-color); }
+.checkbox-container input[type="checkbox"]:checked::after { content: '✓'; color: var(--bg-color); font-size: 16px; font-weight: bold; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.checkbox-container label { margin: 0; color: var(--text-color); font-size: 0.95rem; cursor: pointer; }
+
+/* Randomizer Styles */
+#randomizer { text-align: center; padding: 30px 15px; border: 1px dashed var(--secondary-color); margin: 20px 0; }
+#randomizer-status { font-size: 1.2rem; min-height: 4em; display: flex; align-items: center; justify-content: center; color: var(--accent-color); text-shadow: 0 0 5px var(--accent-color); white-space: pre-wrap; }
+#randomizer-status::after { content: '_'; opacity: 1; animation: blink 1s linear infinite; font-weight: bold; margin-left: 5px; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* Draft Specific Styles */
+.draft-status { text-align: center; margin: 15px 0; font-size: 1.1rem; color: var(--accent-color); text-shadow: 0 0 5px var(--accent-color); min-height: 1.5em; }
+.protocol-list-container { margin-bottom: 20px; border: 1px dashed var(--border-color); padding: 10px; background-color: rgba(0, 50, 40, 0.1); }
+.protocol-list { list-style: none; padding: 0; margin-top: 10px; }
+.protocol-list li { background-color: rgba(0,0,0, 0.3); border-left: 3px solid var(--secondary-color); padding: 8px 12px; margin-bottom: 5px; font-size: 1rem; }
+.protocol-button { width: 100%; margin: 5px 0; max-width: none; font-size: 1rem; padding: 10px; }
+.player-section { margin-bottom: 20px; }
+
+/* Card Viewer Styles */
+#card-filter { width: calc(100% - 30px); margin: 15px; }
+#card-display { border: 1px solid var(--border-color); padding: 15px; margin: 15px; background-color: rgba(0,0,0,0.2); min-height: 100px; }
+#card-display h4 { color: var(--primary-color); margin-bottom: 10px; font-size: 1.2rem; }
+#card-display p { padding: 0; margin-bottom: 5px; }
+#card-display strong { color: var(--text-color); font-weight: bold; }
+
+/* Rules/FAQ Styles */
+.rules-content h4 { color: var(--warning-color); font-size: 1rem; margin: 15px 15px 5px 15px; text-align: left; border-bottom: none; padding: 0; text-shadow: none; }
+.rules-content p, .rules-content ul { font-size: 0.95rem; }
+.rules-content ul { margin-top: 5px; }
+.rules-content code { background-color: rgba(255, 255, 255, 0.1); color: var(--primary-color); padding: 1px 4px; border-radius: 3px; font-size: 0.9em; }
+
+/* Stats Styles */
+#stats-display { border: 1px solid var(--secondary-color); padding: 15px; margin: 20px 0; background-color: rgba(127, 0, 255, 0.05); }
+#stats-display h3 { margin-top: 0; margin-bottom: 15px; }
+#stats-display p { padding: 0; margin-bottom: 5px; color: var(--text-color); }
+#stats-display strong { color: var(--primary-color); }
+#stats-display ul { margin: 0; padding: 0; } /* Reset list style for stats */
+#stats-display li { margin-bottom: 10px !important; padding-left: 0 !important; list-style-type: none !important; } /* Override default li style */
+#stats-display li::before { content: none !important; } /* Remove default li marker */
+#stats-display span { /* Indent matchup details */
+     display: inline-block;
+     padding-left: 15px;
+}
+
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.hidden { display: none; }
+.error-text { color: var(--error-color); text-align: center; margin-top: 10px; }
