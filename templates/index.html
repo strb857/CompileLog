@@ -3,105 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Compile Draft Helper v1.4 (Flask+SQLite)</title>
-    <!-- Link to external CSS file -->
+    <title>Compile Draft Helper v1.5 (Config)</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
     <header class="app-header">
-        <h1>// COMPILE_ASSIST //<span class="version">v1.4 :: Protocol Draft (Flask+SQLite)</span></h1>
+        <h1>// COMPILE_ASSIST //<span class="version">v1.5 :: DB Config</span></h1>
     </header>
 
     <main class="main-content">
 
-        <!-- Draft Section -->
+        <!-- Draft Section (Structure remains the same) -->
         <section id="section-draft" class="app-section">
-            <h2>Draft Interface Module</h2>
-
+            <!-- Content from previous index.html for Draft section -->
+             <h2>Draft Interface Module</h2>
             <!-- Initial Setup View -->
             <div id="initial-setup">
                  <p class="text-center">Configure draft parameters:</p>
-
                  <label for="player1-name">Player 1 Handle:</label>
-                 <input type="text" id="player1-name" value="Player 1" list="player-names-list" autocomplete="off"> <!-- Added autocomplete off -->
-
+                 <input type="text" id="player1-name" value="Player 1" list="player-names-list" autocomplete="off">
                  <label for="player2-name">Player 2 Handle:</label>
-                 <input type="text" id="player2-name" value="Player 2" list="player-names-list" autocomplete="off"> <!-- Added autocomplete off -->
-
-                 <!-- Shared Datalist for both inputs -->
-                 <datalist id="player-names-list">
-                     <!-- Options will be populated by JavaScript -->
-                 </datalist>
-
+                 <input type="text" id="player2-name" value="Player 2" list="player-names-list" autocomplete="off">
+                 <datalist id="player-names-list"></datalist>
                  <div class="checkbox-container">
                      <input type="checkbox" id="include-aux1" checked>
                      <label for="include-aux1">Include Aux 1 Protocols (Light, Love, Apathy)</label>
                  </div>
-
                  <button id="start-draft-process-button" class="action-button">Determine Start & Begin Draft</button>
             </div>
-
-            <!-- Randomizer View (Shown temporarily during start) -->
-            <div id="randomizer" class="hidden">
-                <h3>Determining Initial Draft Priority...</h3>
-                <div id="randomizer-status">Analyzing quantum fluctuations...</div>
-            </div>
-
+            <!-- Randomizer View -->
+            <div id="randomizer" class="hidden"><h3>Determining Initial Draft Priority...</h3><div id="randomizer-status">Analyzing quantum fluctuations...</div></div>
             <!-- Drafting View -->
             <div id="drafting-interface" class="hidden">
-                <p class="text-center" style="margin-bottom:15px;"><strong id="first-player-announcement-drafting"></strong> drafts first.</p>
-                <div id="draft-status" class="draft-status">Initializing...</div>
-
-                <div class="protocol-list-container">
-                    <h3 id="available-protocols-title">Available Protocols:</h3>
-                    <div id="available-protocols-list">
-                        <!-- Protocol buttons will be generated here -->
-                    </div>
-                    <p id="draft-error" class="error-text hidden"></p>
-                </div>
-
-                <div class="player-section">
-                    <h3 id="player1-draft-title">Player 1's Acquired Protocols:</h3>
-                    <ul id="player1-protocols-list" class="protocol-list"></ul>
-                </div>
-
-                <div class="player-section">
-                     <h3 id="player2-draft-title">Player 2's Acquired Protocols:</h3>
-                    <ul id="player2-protocols-list" class="protocol-list"></ul>
-                </div>
+                 <p class="text-center" style="margin-bottom:15px;"><strong id="first-player-announcement-drafting"></strong> drafts first.</p>
+                 <div id="draft-status" class="draft-status">Initializing...</div>
+                 <div class="protocol-list-container">
+                     <h3 id="available-protocols-title">Available Protocols:</h3>
+                     <div id="available-protocols-list"></div>
+                     <p id="draft-error" class="error-text hidden"></p>
+                 </div>
+                 <div class="player-section"><h3 id="player1-draft-title">Player 1's Acquired Protocols:</h3><ul id="player1-protocols-list" class="protocol-list"></ul></div>
+                 <div class="player-section"><h3 id="player2-draft-title">Player 2's Acquired Protocols:</h3><ul id="player2-protocols-list" class="protocol-list"></ul></div>
             </div>
-
             <!-- Results View -->
             <div id="draft-results" class="hidden">
-                <h2>Draft Protocol Complete</h2>
-                <p class="text-center">Final Protocol Allocation:</p>
-                <div class="player-section">
-                    <h3 id="results-p1-title">Player 1's Protocols:</h3>
-                    <ul id="results-p1-list" class="protocol-list"></ul>
-                </div>
-                 <div class="player-section">
-                    <h3 id="results-p2-title">Player 2's Protocols:</h3>
-                    <ul id="results-p2-list" class="protocol-list"></ul>
-                </div>
-                <div id="outcome-recorder">
-                     <h3>Record Game Outcome:</h3>
-                     <button id="p1-wins-button" class="action-button win-button">P1 Wins</button>
-                     <button id="p2-wins-button" class="action-button win-button">P2 Wins</button>
-                     <p id="outcome-message" class="text-center hidden"></p>
-                </div>
+                 <h2>Draft Protocol Complete</h2>
+                 <p class="text-center">Final Protocol Allocation:</p>
+                 <div class="player-section"><h3 id="results-p1-title">Player 1's Protocols:</h3><ul id="results-p1-list" class="protocol-list"></ul></div>
+                 <div class="player-section"><h3 id="results-p2-title">Player 2's Protocols:</h3><ul id="results-p2-list" class="protocol-list"></ul></div>
+                 <div id="outcome-recorder"><h3>Record Game Outcome:</h3><button id="p1-wins-button" class="action-button win-button">P1 Wins</button><button id="p2-wins-button" class="action-button win-button">P2 Wins</button><p id="outcome-message" class="text-center hidden"></p></div>
                  <button id="restart-draft-button" class="action-button">Restart Draft Simulation</button>
             </div>
-
              <!-- Stats Display Area -->
-             <div id="stats-display" class="hidden">
-                 <h3>Session Stats (Stored via Backend)</h3>
-                 <div id="stats-content">Loading stats...</div>
-             </div>
-
+             <div id="stats-display" class="hidden"><h3>Session Stats (Stored via Backend)</h3><div id="stats-content">Loading stats...</div></div>
         </section>
 
-        <!-- Card Viewer Section -->
+        <!-- Card Viewer Section (Structure remains the same) -->
         <section id="section-cards" class="app-section">
             <h2>Card Database Access</h2>
             <p>Filter and view card details. (Requires manual data entry in `cardData` object in the script).</p>
@@ -111,23 +69,97 @@
             </div>
         </section>
 
-        <!-- Rules/FAQ Section -->
+        <!-- Rules/FAQ Section (Structure remains the same) -->
         <section id="section-rules" class="app-section">
-             <h2>Rules Codex & FAQ</h2>
-             <div class="rules-content">
-                 <!-- Rules content -->
-                 <h4>Summary</h4><p>Combine 3 protocols. Wrest control by increasing line value. Use commands to shift code. Compile all 3 protocols to win.</p>
-                 <h4>The Draft</h4><ul><li>Arrange Protocol cards face up (12 from Main 1, optionally +3 from Aux 1).</li><li>Randomize starting player.</li><li>Player 1 drafts 1 Protocol.</li><li>Player 2 drafts 2 Protocols.</li><li>Player 1 drafts 2 Protocols.</li><li>Player 2 drafts 1 Protocol.</li><li>Each player now has 3 Protocols. Return remaining protocols to the box.</li></ul>
-                 <h4>The Deck</h4><p>Each player takes the 6 command cards for each of their 3 drafted protocols (18 cards total) and shuffles them to form their deck.</p>
-                 <h4>Setup</h4><ul><li>Place your 3 protocols "Loading..." side up, left to right in drafted order, forming your side of the Field.</li><li>Place your deck and designate a Trash area.</li><li>Draw 5 cards.</li></ul>
-                 <h4>Turn Order</h4><ul><li><strong>Start:</strong> Perform "Start" effects.</li><li><strong>Check Control A:</strong> (Optional Component) Gain control if value higher in >= 2 lines.</li><li><strong>Check Compile:</strong> MUST Compile if value >= 10 AND > opponent in a line. Only 1 compile per turn. (Action step skipped if compiling).</li><li><strong>Action:</strong> Play 1 card (face-up matching protocol line, or face-down any line) OR Refresh hand (draw to 5). MUST refresh if no cards to play. Cannot refresh if >= 5 cards.</li><li><strong>Check Cache:</strong> If > 5 cards, discard down to 5.</li><li><strong>End:</strong> Perform "End" effects.</li></ul>
-                 <h4>Key Terms (Selected)</h4><ul><li><code>Compile:</code> Delete all cards in a line (yours and opponent's), flip your protocol. If already compiled, draw opponent's top deck card instead of flipping.</li><li><code>Delete:</code> Move card from field to owner's trash (face-up).</li><li><code>Discard:</code> Move card from hand to owner's trash.</li><li><code>Flip:</code> Change face-down <-> face-up.</li><li><code>Line:</code> The play area defined by two opposing protocols. (3 lines total).</li><li><code>Protocol:</code> Defines lines, matches face-up card plays.</li><li><code>Refresh:</code> Draw up to 5 cards (reshuffle trash if deck empty).</li><li><code>Stack:</code> Cards in a line on one player's side.</li><li><code>Uncovered:</code> The outermost card in a stack. Only this card can normally be targeted/manipulated.</li></ul>
-                 <h4>FAQ Quick Hits</h4><ul><li>If you can compile, you MUST.</li><li>Compiling deletes cards simultaneously (no triggers on deletion).</li><li>You can only compile one line per turn.</li><li>Refresh only if < 5 cards. Deck reshuffles only on draw attempt when empty.</li><li>Look at your own face-down cards anytime. Opponent's face-down cards are private.</li><li>"All" affects covered+uncovered simultaneously. "Each" affects viable uncovered cards sequentially.</li></ul>
-                 <p style="margin-top: 20px;">For complete rules, clarifications, and errata, refer to the official source or the full Rules Codex PDF.</p>
-                 <p class="text-center"><a href="https://www.greaterthangames.com/" target="_blank" rel="noopener noreferrer">[ Official Greater Than Games Website ]</a></p>
-                 <p class="text-center" style="margin-top: 20px;">--- End Transmission ---</p>
+            <!-- Content from previous index.html for Rules section -->
+            <h2>Rules Codex & FAQ</h2>
+            <div class="rules-content">
+                <h4>Summary</h4><p>Combine 3 protocols. Wrest control by increasing line value. Use commands to shift code. Compile all 3 protocols to win.</p>
+                <h4>The Draft</h4><ul><li>Arrange Protocol cards face up (12 from Main 1, optionally +3 from Aux 1).</li><li>Randomize starting player.</li><li>Player 1 drafts 1 Protocol.</li><li>Player 2 drafts 2 Protocols.</li><li>Player 1 drafts 2 Protocols.</li><li>Player 2 drafts 1 Protocol.</li><li>Each player now has 3 Protocols. Return remaining protocols to the box.</li></ul>
+                <h4>The Deck</h4><p>Each player takes the 6 command cards for each of their 3 drafted protocols (18 cards total) and shuffles them to form their deck.</p>
+                <h4>Setup</h4><ul><li>Place your 3 protocols "Loading..." side up, left to right in drafted order, forming your side of the Field.</li><li>Place your deck and designate a Trash area.</li><li>Draw 5 cards.</li></ul>
+                <h4>Turn Order</h4><ul><li><strong>Start:</strong> Perform "Start" effects.</li><li><strong>Check Control A:</strong> (Optional Component) Gain control if value higher in >= 2 lines.</li><li><strong>Check Compile:</strong> MUST Compile if value >= 10 AND > opponent in a line. Only 1 compile per turn. (Action step skipped if compiling).</li><li><strong>Action:</strong> Play 1 card (face-up matching protocol line, or face-down any line) OR Refresh hand (draw to 5). MUST refresh if no cards to play. Cannot refresh if >= 5 cards.</li><li><strong>Check Cache:</strong> If > 5 cards, discard down to 5.</li><li><strong>End:</strong> Perform "End" effects.</li></ul>
+                <h4>Key Terms (Selected)</h4><ul><li><code>Compile:</code> Delete all cards in a line (yours and opponent's), flip your protocol. If already compiled, draw opponent's top deck card instead of flipping.</li><li><code>Delete:</code> Move card from field to owner's trash (face-up).</li><li><code>Discard:</code> Move card from hand to owner's trash.</li><li><code>Flip:</code> Change face-down <-> face-up.</li><li><code>Line:</code> The play area defined by two opposing protocols. (3 lines total).</li><li><code>Protocol:</code> Defines lines, matches face-up card plays.</li><li><code>Refresh:</code> Draw up to 5 cards (reshuffle trash if deck empty).</li><li><code>Stack:</code> Cards in a line on one player's side.</li><li><code>Uncovered:</code> The outermost card in a stack. Only this card can normally be targeted/manipulated.</li></ul>
+                <h4>FAQ Quick Hits</h4><ul><li>If you can compile, you MUST.</li><li>Compiling deletes cards simultaneously (no triggers on deletion).</li><li>You can only compile one line per turn.</li><li>Refresh only if < 5 cards. Deck reshuffles only on draw attempt when empty.</li><li>Look at your own face-down cards anytime. Opponent's face-down cards are private.</li><li>"All" affects covered+uncovered simultaneously. "Each" affects viable uncovered cards sequentially.</li></ul>
+                <p style="margin-top: 20px;">For complete rules, clarifications, and errata, refer to the official source or the full Rules Codex PDF.</p>
+                <p class="text-center"><a href="https://www.greaterthangames.com/" target="_blank" rel="noopener noreferrer">[ Official Greater Than Games Website ]</a></p>
+                <p class="text-center" style="margin-top: 20px;">--- End Transmission ---</p>
             </div>
         </section>
+
+        <!-- NEW Config Section -->
+        <section id="section-config" class="app-section">
+            <h2>Configuration & Data Management</h2>
+
+            <div id="config-loading" class="text-center">Loading game logs...</div>
+            <div id="config-error" class="error-text hidden"></div>
+            <div id="config-log-table-container" class="hidden">
+                <p>Click Edit or Delete to manage individual game logs.</p>
+                <div class="log-table-wrapper"> <!-- Wrapper for scrolling -->
+                    <table id="config-log-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Timestamp</th>
+                                <th>P1</th>
+                                <th>P1 Protocols</th>
+                                <th>P2</th>
+                                <th>P2 Protocols</th>
+                                <th>Winner</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="config-log-table-body">
+                            <!-- Log rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="config-no-logs" class="text-center hidden" style="margin-top: 20px;">
+                <p>No game logs found in the database.</p>
+            </div>
+
+            <div id="config-clear-section" style="margin-top: 30px; border-top: 1px dashed var(--error-color); padding-top: 20px;">
+                <h3 style="color: var(--error-color); text-shadow: 0 0 5px var(--error-color);">Danger Zone</h3>
+                <button id="clear-all-logs-button" class="action-button" style="border-color: var(--error-color); color: var(--error-color);">Clear All Game Logs</button>
+                <p class="text-center" style="color: var(--warning-color); font-size: 0.9rem;">Warning: This action is irreversible!</p>
+            </div>
+        </section>
+
+        <!-- NEW Edit Modal -->
+        <div id="edit-log-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal-button">×</span>
+                <h3>Edit Game Log (ID: <span id="edit-log-id"></span>)</h3>
+                <form id="edit-log-form">
+                    <input type="hidden" id="edit-log-id-input">
+
+                    <label for="edit-p1-name">Player 1 Name:</label>
+                    <input type="text" id="edit-p1-name" required list="player-names-list" autocomplete="off">
+
+                    <label for="edit-p1-protocols">Player 1 Protocols (comma-separated):</label>
+                    <input type="text" id="edit-p1-protocols" required placeholder="e.g., Fire,Water,Metal">
+
+                     <label for="edit-p2-name">Player 2 Name:</label>
+                    <input type="text" id="edit-p2-name" required list="player-names-list" autocomplete="off">
+
+                    <label for="edit-p2-protocols">Player 2 Protocols (comma-separated):</label>
+                    <input type="text" id="edit-p2-protocols" required placeholder="e.g., Spirit,Life,Hate">
+
+                    <label for="edit-winner-name">Winner Name:</label>
+                    <input type="text" id="edit-winner-name" required list="edit-winner-list" autocomplete="off">
+                     <datalist id="edit-winner-list">
+                         <!-- Options added dynamically based on P1/P2 names -->
+                     </datalist>
+
+                     <div id="edit-log-error" class="error-text hidden"></div>
+
+                     <button type="submit" class="action-button">Save Changes</button>
+                     <button type="button" class="action-button cancel-edit-button" style="border-color: var(--disabled-color); color: var(--disabled-color); margin-top: 5px;">Cancel</button>
+                </form>
+            </div>
+        </div>
 
     </main>
 
@@ -135,6 +167,8 @@
         <button class="nav-button" data-section="draft">Draft</button>
         <button class="nav-button" data-section="cards">Cards</button>
         <button class="nav-button" data-section="rules">Rules</button>
+        <!-- NEW Config Button -->
+        <button class="nav-button" data-section="config">Config</button>
     </nav>
 
     <!-- Link to external JS file -->

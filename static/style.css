@@ -102,6 +102,147 @@ label { display: block; margin: 10px 15px 5px 15px; color: var(--primary-color);
      padding-left: 15px;
 }
 
+/* Config Section Table */
+#config-log-table-container {
+    margin-top: 15px;
+}
+
+.log-table-wrapper {
+    max-height: 40vh; /* Limit height and make scrollable */
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    margin-bottom: 15px; /* Space before Danger Zone */
+}
+
+#config-log-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem; /* Smaller text in table */
+    white-space: nowrap; /* Prevent text wrapping initially */
+}
+
+#config-log-table th,
+#config-log-table td {
+    border: 1px solid var(--border-color);
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+}
+
+#config-log-table th {
+    background-color: rgba(0, 255, 204, 0.1);
+    color: var(--primary-color);
+    position: sticky; /* Make header sticky */
+    top: 0;
+    z-index: 1;
+}
+
+#config-log-table td {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--text-color);
+}
+
+#config-log-table tr:nth-child(even) td {
+     background-color: rgba(0, 0, 0, 0.3);
+}
+
+#config-log-table .log-protocols {
+    font-size: 0.75rem;
+    white-space: normal; /* Allow protocol lists to wrap */
+    min-width: 100px; /* Give protocol columns some width */
+}
+
+
+#config-log-table .log-actions button {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+    margin: 2px;
+    width: auto; /* Override default button width */
+    display: inline-block;
+    border-width: 1px !important; /* Ensure borders are visible */
+    min-width: 40px; /* Ensure button is clickable */
+}
+
+#config-log-table .edit-log-btn {
+    border-color: var(--warning-color);
+    color: var(--warning-color);
+}
+#config-log-table .edit-log-btn:hover {
+    background-color: rgba(255, 221, 0, 0.15);
+}
+
+
+#config-log-table .delete-log-btn {
+    border-color: var(--error-color);
+    color: var(--error-color);
+}
+#config-log-table .delete-log-btn:hover {
+     background-color: rgba(255, 68, 68, 0.15);
+}
+
+
+/* Edit Modal Styles */
+.modal {
+    position: fixed; /* Stay in place */
+    z-index: 20; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+    display: flex; /* Use flexbox for centering */
+    align-items: center;
+    justify-content: center;
+    padding: 10px; /* Padding around modal */
+}
+
+.modal-content {
+    background-color: var(--bg-color);
+    margin: auto;
+    padding: 20px;
+    border: 1px solid var(--primary-color);
+    box-shadow: 0 0 15px var(--glow-color);
+    width: 90%;
+    max-width: 500px;
+    position: relative; /* For positioning the close button */
+    max-height: 90vh; /* Limit height */
+    overflow-y: auto; /* Scroll if content exceeds height */
+}
+
+.close-modal-button {
+    color: var(--disabled-color);
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.close-modal-button:hover,
+.close-modal-button:focus {
+    color: var(--error-color);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#edit-log-form label {
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+#edit-log-form input[type="text"] {
+    width: 100%; /* Full width within modal */
+    margin-left: 0;
+    margin-right: 0;
+}
+
+#edit-log-form button {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+}
 
 /* Utility Classes */
 .text-center { text-align: center; }

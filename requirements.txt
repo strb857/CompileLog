@@ -1,0 +1,2 @@
+Flask
+# Add any other libraries you might have installed, though for this project Flask might be the only one needed besides built-ins like sqlite3, json, os.
