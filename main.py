@@ -1,4 +1,4 @@
-# main.py (Additions and Modifications)
+# main.py
 
 from flask import Flask, render_template, request, jsonify
 import sqlite3
@@ -15,7 +15,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE_PATH = os.path.join(BASE_DIR, DATABASE_NAME)
 
 # --- Database Helper Functions ---
-
 def get_db_connection():
     """Establishes a connection to the SQLite database."""
     try:
@@ -28,7 +27,6 @@ def get_db_connection():
 
 def init_db():
     """Initializes the database."""
-    # (Keep the init_db function as it was)
     print(f"Initializing database at: {DATABASE_PATH}")
     conn = get_db_connection()
     if conn is None:
@@ -58,7 +56,6 @@ def init_db():
 
 def add_game_log_db(log_entry):
     """Adds a new game log entry."""
-    # (Keep add_game_log_db as it was)
     conn = get_db_connection()
     if conn is None: raise ConnectionError("Failed to connect to the database.")
     try:
@@ -78,7 +75,6 @@ def add_game_log_db(log_entry):
 
 def get_all_game_logs_db():
     """Retrieves all game logs."""
-    # (Keep get_all_game_logs_db as it was)
     conn = get_db_connection()
     if conn is None: raise ConnectionError("Failed to connect to the database.")
     try:
@@ -93,7 +89,7 @@ def get_all_game_logs_db():
     finally:
         if conn: conn.close()
 
-# --- NEW DB Function: Get single log ---
+# --- Get single log ---
 def get_log_by_id_db(log_id):
     """Retrieves a single game log by its ID."""
     conn = get_db_connection()
@@ -108,7 +104,7 @@ def get_log_by_id_db(log_id):
     finally:
         if conn: conn.close()
 
-# --- NEW DB Function: Update log ---
+# --- Update log ---
 def update_log_db(log_id, data):
     """Updates an existing game log."""
     conn = get_db_connection()
@@ -141,7 +137,7 @@ def update_log_db(log_id, data):
     finally:
         if conn: conn.close()
 
-# --- NEW DB Function: Delete log ---
+# --- Delete log ---
 def delete_log_db(log_id):
     """Deletes a specific game log."""
     conn = get_db_connection()
@@ -157,7 +153,7 @@ def delete_log_db(log_id):
     finally:
         if conn: conn.close()
 
-# --- NEW DB Function: Clear all logs ---
+# --- Clear all logs ---
 def clear_all_logs_db():
     """Deletes all entries from the game_logs table."""
     conn = get_db_connection()
@@ -176,10 +172,8 @@ def clear_all_logs_db():
     finally:
         if conn: conn.close()
 
-
 def calculate_stats(logs):
-    """Calculates stats (Keep calculate_stats as it was)"""
-    # ... (previous calculate_stats code remains here) ...
+    """Calculates stats"""
     stats = {
         "gamesPlayed": 0, # Start at 0, increment only for valid logs
         "playerWins": defaultdict(int),
@@ -196,36 +190,46 @@ def calculate_stats(logs):
             winner = game.get("winner_name")
             if not isinstance(p1_protos, list) or not isinstance(p2_protos, list): continue
             valid_games_processed += 1
-            stats["playerWins"][p1_name] = stats["playerWins"].get(p1_name, 0); stats["playerWins"][p2_name] = stats["playerWins"].get(p2_name, 0)
+            # Initialize player entries safely
+            stats["playerWins"][p1_name] = stats["playerWins"].get(p1_name, 0)
+            stats["playerWins"][p2_name] = stats["playerWins"].get(p2_name, 0)
             if winner: stats["playerWins"][winner] += 1
+
             winner_protos = []; loser_protos = []
             if winner == p1_name: winner_protos = p1_protos; loser_protos = p2_protos
             elif winner == p2_name: winner_protos = p2_protos; loser_protos = p1_protos
-            for p in p1_protos:
-                if p: stats["protocolStats"][p]
-            for p in p2_protos:
-                if p: stats["protocolStats"][p]
+
+            # Increment wins/losses directly; defaultdict handles initialization
             for p in winner_protos:
-                 if not p: continue; stats["protocolStats"][p]["wins"] += 1
+                 if not p: continue
+                 stats["protocolStats"][p]["wins"] += 1
             for p in loser_protos:
-                 if not p: continue; stats["protocolStats"][p]["losses"] += 1
+                 if not p: continue
+                 stats["protocolStats"][p]["losses"] += 1
+
+            # --- Protocol Matchup Calculation (unchanged) ---
             if len(p1_protos) == 3 and len(p2_protos) == 3 and winner:
                 for i in range(3):
                     proto1 = p1_protos[i]; proto2 = p2_protos[i]
                     if not proto1 or not proto2: continue
                     proto_A, proto_B = sorted([proto1, proto2]); matchup_key = f"{proto_A}_vs_{proto_B}"
-                    matchup_data = stats["protocolMatchups"][matchup_key]
+                    matchup_data = stats["protocolMatchups"][matchup_key] # defaultdict initializes if needed
                     if winner == p1_name:
                         if proto1 == proto_A: matchup_data["wins_A"] += 1
                         else: matchup_data["losses_A"] += 1
                     elif winner == p2_name:
                         if proto2 == proto_A: matchup_data["wins_A"] += 1
                         else: matchup_data["losses_A"] += 1
-                    stats["protocolMatchups"][matchup_key] = matchup_data
+                    # No need to assign back, modifying the mutable dict directly
+                    # stats["protocolMatchups"][matchup_key] = matchup_data # This line is redundant for defaultdicts with mutable values
+
         except json.JSONDecodeError as json_err: print(f"Warning: Skipping log due to JSON decode error: {json_err}"); continue
         except Exception as calc_err: print(f"Warning: Error processing log {game.get('id', 'N/A')}: {calc_err}"); continue
     stats["gamesPlayed"] = valid_games_processed
-    stats["playerWins"] = dict(stats["playerWins"]); stats["protocolStats"] = dict(stats["protocolStats"]); stats["protocolMatchups"] = dict(stats["protocolMatchups"])
+    # Convert defaultdicts to regular dicts for the final output
+    stats["playerWins"] = dict(stats["playerWins"])
+    stats["protocolStats"] = dict(stats["protocolStats"])
+    stats["protocolMatchups"] = dict(stats["protocolMatchups"])
     return stats
 
 

@@ -1,5 +1,5 @@
 // static/script.js
-// Complete JavaScript for Compile Draft Helper v1.5 (Flask+SQLite+Config)
+// Complete JavaScript for Compile Draft Helper v1.51 (Flask+SQLite+Config)
 
 document.addEventListener('DOMContentLoaded', () => {
 
